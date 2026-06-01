@@ -663,22 +663,22 @@
 
                     <div class="voice-controls">
                         <div class="voice-control">
-                            <label>Speed</label>
+                            <label>Speed (0.5x - 2x)</label>
                             <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1">
                         </div>
                         <div class="voice-control">
-                            <label>Pitch</label>
+                            <label>Pitch (0.5x - 2x)</label>
                             <input type="range" id="voicePitch" min="0.5" max="2" step="0.1" value="1">
                         </div>
-                        <button class="btn-primary btn-voice" onclick="speakTranslation()">Listen to Translation</button>
-                        <button class="btn-secondary" onclick="stopSpeaking()">Stop</button>
+                        <button class="btn-primary btn-voice" onclick="speakTranslation()">🔊 Listen to Translation</button>
+                        <button class="btn-secondary" onclick="stopSpeaking()">⏹️ Stop</button>
                     </div>
 
                     <div class="share-buttons">
-                        <button class="share-btn btn-primary" onclick="shareToSocial('twitter')">Twitter</button>
-                        <button class="share-btn btn-primary" onclick="shareToSocial('facebook')">Facebook</button>
-                        <button class="share-btn btn-primary" onclick="shareToSocial('whatsapp')">WhatsApp</button>
-                        <button class="share-btn btn-primary" onclick="saveTranslation()">Save to Library</button>
+                        <button class="share-btn btn-primary" onclick="shareToSocial('twitter')">🐦 Twitter</button>
+                        <button class="share-btn btn-primary" onclick="shareToSocial('facebook')">📘 Facebook</button>
+                        <button class="share-btn btn-primary" onclick="shareToSocial('whatsapp')">💬 WhatsApp</button>
+                        <button class="share-btn btn-primary" onclick="saveTranslation()">💾 Save to Library</button>
                     </div>
                 </div>
             </div>
@@ -687,7 +687,7 @@
         <!-- Saved Panel -->
         <div id="saved-panel" class="content-panel">
             <div class="button-group">
-                <button class="btn-primary" onclick="loadSavedTranslations()">Load Library</button>
+                <button class="btn-primary" onclick="loadSavedTranslations()">📚 Load Library</button>
             </div>
             <div id="savedList"></div>
         </div>
@@ -717,7 +717,7 @@
         let currentTranslation = {};
         let currentUtterance = null;
 
-        // Voice mapping for different languages
+        // Voice mapping for different languages - CORRECT ACCENT MAPPING
         const voiceMap = {
             'en': 'en-US',      // English (US)
             'hi': 'hi-IN',      // Hindi (India)
@@ -737,9 +737,9 @@
             document.body.classList.toggle('dark-mode');
             const btn = document.querySelector('.theme-toggle');
             if (document.body.classList.contains('dark-mode')) {
-                btn.textContent = 'Switch to Light Mode';
+                btn.textContent = '☀️ Switch to Light Mode';
             } else {
-                btn.textContent = 'Switch to Dark Mode';
+                btn.textContent = '🌙 Switch to Dark Mode';
             }
         }
 
@@ -774,11 +774,11 @@
             const targetLang = document.getElementById('targetLang').value;
 
             if (!text.trim()) {
-                showStatus('Please enter text to translate', 'error');
+                showStatus('⚠️ Please enter text to translate', 'error');
                 return;
             }
 
-            showStatus('Translating...', 'loading');
+            showStatus('🔄 Translating...', 'loading');
 
             try {
                 const response = await fetch('/translate', {
@@ -798,12 +798,13 @@
                     document.getElementById('originalText').innerHTML = escapeHtml(data.original);
                     document.getElementById('translatedText').innerHTML = escapeHtml(data.translated);
                     document.getElementById('result').style.display = 'block';
-                    showStatus('Translation complete', 'success');
+                    showStatus('✅ Translation complete!', 'success');
                 } else {
-                    showStatus('Translation failed', 'error');
+                    showStatus('❌ Translation failed. Please try again.', 'error');
                 }
             } catch (error) {
-                showStatus('Connection error', 'error');
+                console.error('Translation error:', error);
+                showStatus('❌ Connection error. Check if server is running.', 'error');
             }
         }
 
@@ -814,28 +815,39 @@
             return div.innerHTML;
         }
 
-        // Helper function to get the best voice for a language
+        // Function to find and set the best voice for a specific language
         function setBestVoiceForUtterance(utterance, targetLang) {
-            const voices = window.speechSynthesis.getVoices();
-            const targetVoiceCode = voiceMap[targetLang] || 'en-US';
+            // Wait for voices to be loaded
+            const setVoice = () => {
+                const voices = window.speechSynthesis.getVoices();
+                const targetVoiceCode = voiceMap[targetLang] || 'en-US';
+                
+                // Priority 1: Exact match (e.g., 'es-ES')
+                let selectedVoice = voices.find(voice => voice.lang === targetVoiceCode);
+                
+                // Priority 2: Same language prefix (e.g., 'es' for Spanish)
+                if (!selectedVoice) {
+                    const langPrefix = targetVoiceCode.split('-')[0];
+                    selectedVoice = voices.find(voice => voice.lang.startsWith(langPrefix));
+                }
+                
+                // Priority 3: Any voice that includes the language code
+                if (!selectedVoice) {
+                    selectedVoice = voices.find(voice => voice.lang.includes(targetLang));
+                }
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    console.log(`✅ Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+                } else {
+                    console.log(`⚠️ No specific voice found for ${targetLang}, using default`);
+                }
+            };
             
-            // First try to find an exact match
-            let selectedVoice = voices.find(voice => voice.lang === targetVoiceCode);
-            
-            // If no exact match, try to find any voice with the same language prefix
-            if (!selectedVoice) {
-                const langPrefix = targetVoiceCode.split('-')[0];
-                selectedVoice = voices.find(voice => voice.lang.startsWith(langPrefix));
-            }
-            
-            // If still no match, try to find a voice that includes the language code
-            if (!selectedVoice) {
-                selectedVoice = voices.find(voice => voice.lang.includes(targetLang));
-            }
-            
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-                console.log(`Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+            if (window.speechSynthesis.getVoices().length > 0) {
+                setVoice();
+            } else {
+                window.speechSynthesis.onvoiceschanged = setVoice;
             }
             
             return utterance;
@@ -848,10 +860,11 @@
             const pitch = document.getElementById('voicePitch').value;
 
             if (!text || text === 'Translation') {
-                showStatus('No translation to speak', 'error');
+                showStatus('⚠️ No translation to speak. Translate something first!', 'error');
                 return;
             }
 
+            // Cancel any ongoing speech
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
             }
@@ -859,7 +872,7 @@
             setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(text);
                 
-                // Set the language code
+                // Set language code
                 utterance.lang = voiceMap[targetLang] || 'en-US';
                 utterance.rate = parseFloat(speed);
                 utterance.pitch = parseFloat(pitch);
@@ -869,16 +882,16 @@
                 
                 utterance.onstart = function() {
                     const langName = document.getElementById('targetLang').options[document.getElementById('targetLang').selectedIndex]?.text || targetLang;
-                    showStatus(`Speaking in ${langName}...`, 'success');
+                    showStatus(`🔊 Speaking in ${langName}...`, 'success');
                 };
                 
                 utterance.onend = function() {
-                    showStatus('Finished speaking', 'success');
+                    showStatus('✅ Finished speaking', 'success');
                 };
                 
                 utterance.onerror = function(event) {
                     console.error('Speech error:', event);
-                    showStatus('Speech failed. Browser may not support this language.', 'error');
+                    showStatus('❌ Speech failed. Your browser may not support this language.', 'error');
                 };
                 
                 window.speechSynthesis.speak(utterance);
@@ -889,13 +902,13 @@
         function stopSpeaking() {
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.cancel();
-                showStatus('Stopped', 'success');
+                showStatus('⏹️ Stopped speaking', 'success');
             }
         }
 
         async function saveTranslation() {
             if (!currentTranslation.original) {
-                showStatus('No translation to save', 'error');
+                showStatus('⚠️ No translation to save', 'error');
                 return;
             }
 
@@ -912,12 +925,13 @@
                 });
 
                 if (response.ok) {
-                    showStatus('Saved to library', 'success');
+                    showStatus('💾 Saved to library!', 'success');
                 } else {
-                    showStatus('Save failed', 'error');
+                    showStatus('❌ Save failed', 'error');
                 }
             } catch (error) {
-                showStatus('Error saving', 'error');
+                console.error('Save error:', error);
+                showStatus('❌ Error saving', 'error');
             }
         }
 
@@ -927,8 +941,8 @@
                 const data = await response.json();
                 const savedList = document.getElementById('savedList');
 
-                if (data.translations.length === 0) {
-                    savedList.innerHTML = '<div class="result-card"><p>Your library is empty</p></div>';
+                if (!data.translations || data.translations.length === 0) {
+                    savedList.innerHTML = '<div class="result-card"><p>📭 Your library is empty. Save some translations first!</p></div>';
                 } else {
                     let html = '';
                     for (let i = 0; i < data.translations.length; i++) {
@@ -941,33 +955,33 @@
                         html += `
                             <div class="saved-item">
                                 <div style="margin-bottom: 8px; color: #6b7280; font-size: 0.75rem;">
-                                    ${new Date(t.timestamp).toLocaleString()}
+                                    📅 ${new Date(t.timestamp).toLocaleString()}
                                 </div>
                                 <div style="margin-bottom: 8px;">
                                     <strong>${safeSourceName} → ${safeTargetName}</strong>
                                 </div>
-                                <div style="margin-bottom: 8px; color: #6b7280;">
-                                    ${safeOriginal.substring(0, 100)}${t.original.length > 100 ? '...' : ''}
+                                <div style="margin-bottom: 8px; color: #6b7280; font-size: 0.9rem;">
+                                    "${safeOriginal.substring(0, 100)}${t.original.length > 100 ? '...' : ''}"
                                 </div>
-                                <div style="margin-bottom: 12px;">
-                                    ${safeTranslated.substring(0, 100)}${t.translated.length > 100 ? '...' : ''}
+                                <div style="margin-bottom: 12px; font-size: 1rem;">
+                                    "${safeTranslated.substring(0, 100)}${t.translated.length > 100 ? '...' : ''}"
                                 </div>
-                                <button class="btn-secondary" onclick="speakSavedText('${safeTranslated.replace(/'/g, "\\'")}', '${t.target_lang}')" style="padding: 6px 16px; font-size: 0.75rem;">Listen to Translation</button>
+                                <button class="btn-secondary" onclick="speakSavedText('${safeTranslated.replace(/'/g, "\\'")}', '${t.target_lang}')" style="padding: 6px 16px; font-size: 0.75rem;">🔊 Listen</button>
                             </div>
                         `;
                     }
                     savedList.innerHTML = html;
                 }
-                showStatus('Library loaded', 'success');
+                showStatus('📚 Library loaded!', 'success');
             } catch (error) {
                 console.error('Error loading library:', error);
-                showStatus('Error loading library', 'error');
+                showStatus('❌ Error loading library', 'error');
             }
         }
 
         function speakSavedText(text, lang) {
             if (!text || text.trim() === '' || text === 'Translation') {
-                showStatus('No text to speak', 'error');
+                showStatus('⚠️ No text to speak', 'error');
                 return;
             }
 
@@ -982,20 +996,19 @@
                 utterance.rate = 1;
                 utterance.pitch = 1;
                 
-                // Set the best available voice
                 setBestVoiceForUtterance(utterance, lang);
                 
                 utterance.onstart = function() {
-                    showStatus('Playing saved translation...', 'success');
+                    showStatus('🔊 Playing saved translation...', 'success');
                 };
                 
                 utterance.onend = function() {
-                    showStatus('Finished', 'success');
+                    showStatus('✅ Finished', 'success');
                 };
                 
                 utterance.onerror = function(event) {
                     console.error('Speech error:', event);
-                    showStatus('Speech failed. Try a different language.', 'error');
+                    showStatus('❌ Speech failed', 'error');
                 };
                 
                 window.speechSynthesis.speak(utterance);
@@ -1004,24 +1017,28 @@
 
         async function shareToSocial(platform) {
             if (!currentTranslation.translated) {
-                showStatus('No translation to share', 'error');
+                showStatus('⚠️ No translation to share', 'error');
                 return;
             }
 
-            const response = await fetch('/share', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    original: currentTranslation.original,
-                    translated: currentTranslation.translated,
-                    platform: platform
-                })
-            });
+            try {
+                const response = await fetch('/share', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        original: currentTranslation.original,
+                        translated: currentTranslation.translated,
+                        platform: platform
+                    })
+                });
 
-            const data = await response.json();
-            if (data.share_url) {
-                window.open(data.share_url, '_blank');
-                showStatus('Sharing dialog opened', 'success');
+                const data = await response.json();
+                if (data.share_url) {
+                    window.open(data.share_url, '_blank');
+                    showStatus('📤 Sharing dialog opened', 'success');
+                }
+            } catch (error) {
+                showStatus('❌ Share failed', 'error');
             }
         }
 
@@ -1030,11 +1047,11 @@
             const lang = document.getElementById('pronounceLang').value;
 
             if (!text.trim()) {
-                showStatus('Please enter text', 'error');
+                showStatus('⚠️ Please enter text', 'error');
                 return;
             }
 
-            showStatus('Generating guide...', 'loading');
+            showStatus('🔍 Generating guide...', 'loading');
 
             try {
                 const response = await fetch('/pronunciation', {
@@ -1054,26 +1071,26 @@
                 resultDiv.innerHTML = `
                     <div class="pronunciation-card">
                         <div class="result-section">
-                            <div class="result-label">Pronunciation Guide</div>
+                            <div class="result-label">📖 Pronunciation Guide</div>
                             <div class="result-text">${escapeHtml(data.guide)}</div>
                         </div>
                         <div class="result-section">
-                            <div class="result-label">Tips</div>
+                            <div class="result-label">💡 Tips</div>
                             ${tipsHtml}
                         </div>
-                        <button class="btn-primary" onclick="speakText('${escapeHtml(data.text)}', '${lang}')">Listen to Example</button>
+                        <button class="btn-primary" onclick="speakText('${escapeHtml(data.text)}', '${lang}')">🔊 Listen to Example</button>
                     </div>
                 `;
-                showStatus('Guide generated', 'success');
+                showStatus('✅ Guide generated!', 'success');
             } catch (error) {
                 console.error('Error:', error);
-                showStatus('Error generating guide', 'error');
+                showStatus('❌ Error generating guide', 'error');
             }
         }
 
         function speakText(text, lang) {
             if (!text || text.trim() === '') {
-                showStatus('No text to speak', 'error');
+                showStatus('⚠️ No text to speak', 'error');
                 return;
             }
 
@@ -1091,11 +1108,11 @@
                 setBestVoiceForUtterance(utterance, lang);
                 
                 utterance.onstart = function() {
-                    showStatus('Speaking...', 'success');
+                    showStatus('🔊 Speaking...', 'success');
                 };
                 
                 utterance.onend = function() {
-                    showStatus('Finished', 'success');
+                    showStatus('✅ Finished', 'success');
                 };
                 
                 window.speechSynthesis.speak(utterance);
@@ -1107,21 +1124,21 @@
             document.getElementById('result').style.display = 'none';
             currentTranslation = {};
             stopSpeaking();
-            showStatus('Cleared', 'success');
+            showStatus('🗑️ Cleared', 'success');
         }
 
         // Initialize voices when the page loads
         window.addEventListener('load', function() {
-            // Pre-load voices
             if (window.speechSynthesis) {
+                // Pre-load voices
                 window.speechSynthesis.getVoices();
-                // Some browsers need this to load voices properly
                 if (window.speechSynthesis.onvoiceschanged !== undefined) {
                     window.speechSynthesis.onvoiceschanged = function() {
-                        console.log('Voices loaded');
+                        console.log('🎤 Speech synthesis voices loaded');
                     };
                 }
             }
+            console.log('🚀 LinguaFlow is ready!');
         });
     </script>
 </body>
