@@ -20,23 +20,22 @@ class LyricsTranslator:
             'tr': 'Turkish', 'pl': 'Polish', 'nl': 'Dutch', 'sv': 'Swedish'
         }
     
-    # ========== NEW METHOD - ADD THIS ==========
+    # ============================================
+    # MAIN TRANSLATE METHOD - FastAPI yehi call karega
+    # ============================================
     def translate(self, text: str, source_lang: str = "auto", target_lang: str = "en") -> dict:
         """
-        Main translate method that matches what main.py expects.
+        Main translate method - returns dictionary with original, translated, etc.
         """
         try:
+            # Call the actual translation function
             translated_text = self.translate_lyrics(text, source_lang, target_lang)
             
-            if "unavailable" in translated_text.lower() or "error" in translated_text.lower():
-                lang_names = {
-                    'en': 'English', 'hi': 'Hindi', 'es': 'Spanish', 'fr': 'French',
-                    'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'ja': 'Japanese',
-                    'ko': 'Korean', 'zh': 'Chinese', 'ru': 'Russian', 'ar': 'Arabic'
-                }
-                target_name = lang_names.get(target_lang, target_lang)
-                translated_text = f"[{target_name}] {text}"
+            # Agar translation fail ho jaye toh fallback
+            if not translated_text or "unavailable" in translated_text.lower() or "error" in translated_text.lower():
+                translated_text = self._get_fallback_translation(text, target_lang)
             
+            # Language detect karo agar auto hai
             detected_lang = None
             if source_lang == "auto":
                 detected_lang = self._detect_language(text)
@@ -52,11 +51,21 @@ class LyricsTranslator:
             print(f"Translation error: {e}")
             return {
                 "original": text,
-                "translated": f"[Translation unavailable] {text}",
+                "translated": self._get_fallback_translation(text, target_lang),
                 "source_lang": source_lang,
                 "target_lang": target_lang,
                 "detected_lang": None
             }
+    
+    def _get_fallback_translation(self, text, target_lang):
+        """Fallback translation jab API kaam nahi kare"""
+        lang_names = {
+            'en': 'English', 'hi': 'Hindi', 'es': 'Spanish', 'fr': 'French',
+            'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'ja': 'Japanese',
+            'ko': 'Korean', 'zh': 'Chinese', 'ru': 'Russian', 'ar': 'Arabic'
+        }
+        target_name = lang_names.get(target_lang, target_lang)
+        return f"[{target_name}] {text}"
     
     def _detect_language(self, text: str) -> str:
         """Simple language detection"""
@@ -66,29 +75,72 @@ class LyricsTranslator:
             return "zh"
         if any('\u0600' <= c <= '\u06FF' for c in text):
             return "ar"
-        if any('\u0E00' <= c <= '\u0E7F' for c in text):
-            return "th"
         return "en"
-    # ========== END OF NEW METHOD ==========
     
     def translate_lyrics(self, text, source_lang='auto', target_lang='en'):
         """Translate using multiple fallback APIs"""
         
         methods = [
-            self._translate_lingva,
+            self._translate_mymemory,      # Sabse reliable
             self._translate_libretranslate,
+            self._translate_lingva,
             self._translate_simple_google
         ]
         
         for method in methods:
             try:
                 result = method(text, source_lang, target_lang)
-                if result and "error" not in result.lower():
+                if result and result != text and "error" not in result.lower():
                     return result
-            except:
+            except Exception as e:
+                print(f"Method {method.__name__} failed: {e}")
                 continue
         
-        return "Translation temporarily unavailable. Please check your internet connection."
+        return None
+    
+    def _translate_mymemory(self, text, source_lang, target_lang):
+        """Use MyMemory API - Most reliable free API"""
+        try:
+            url = "https://api.mymemory.translated.net/get"
+            source = source_lang if source_lang != 'auto' else 'en'
+            params = {
+                "q": text,
+                "langpair": f"{source}|{target_lang}",
+                "de": "linguaflow@example.com"
+            }
+            response = requests.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                translated = data.get("responseData", {}).get("translatedText", text)
+                # Remove the " [source]" suffix that MyMemory sometimes adds
+                if " [" in translated:
+                    translated = translated.split(" [")[0]
+                if translated and translated != text:
+                    return translated
+            return None
+        except Exception as e:
+            print(f"MyMemory error: {e}")
+            return None
+    
+    def _translate_libretranslate(self, text, source_lang, target_lang):
+        """Use LibreTranslate"""
+        try:
+            url = "https://libretranslate.com/translate"
+            payload = {
+                "q": text,
+                "source": source_lang if source_lang != 'auto' else 'auto',
+                "target": target_lang,
+                "format": "text"
+            }
+            headers = {"Content-Type": "application/json"}
+            response = requests.post(url, json=payload, headers=headers, timeout=10)
+            if response.status_code == 200:
+                result = response.json()
+                return result.get('translatedText', text)
+            return None
+        except Exception as e:
+            print(f"LibreTranslate error: {e}")
+            return None
     
     def _translate_lingva(self, text, source_lang, target_lang):
         """Use Lingva Translate"""
@@ -106,23 +158,6 @@ class LyricsTranslator:
                         return data.get('translation', text)
                 except:
                     continue
-            return None
-        except:
-            return None
-    
-    def _translate_libretranslate(self, text, source_lang, target_lang):
-        """Use LibreTranslate"""
-        try:
-            url = "https://translate.argosopentech.com/translate"
-            payload = {
-                "q": text,
-                "source": source_lang if source_lang != 'auto' else 'auto',
-                "target": target_lang,
-                "format": "text"
-            }
-            response = requests.post(url, json=payload, timeout=5)
-            if response.status_code == 200:
-                return response.json().get('translatedText', text)
             return None
         except:
             return None
@@ -199,7 +234,8 @@ class LyricsTranslator:
                 'guide': text_lower.replace('ll', 'y').replace('ñ', 'ny'),
                 'tips': [
                     "🇪🇸 'LL' sounds like 'Y' in 'yes'",
-                    "🇪🇸 'Ñ' sounds like 'NY' in 'canyon'"
+                    "🇪🇸 'Ñ' sounds like 'NY' in 'canyon'",
+                    "🇪🇸 Roll your R's"
                 ]
             }
         }
