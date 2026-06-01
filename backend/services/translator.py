@@ -8,34 +8,25 @@ class LyricsTranslator:
     def __init__(self):
         self.saved_lyrics_file = "saved_translations.json"
         
-        # Comprehensive language support
         self.language_map = {
             'es': 'Spanish', 'en': 'English', 'fr': 'French', 'de': 'German',
             'it': 'Italian', 'pt': 'Portuguese', 'ja': 'Japanese', 'ko': 'Korean',
-            'zh': 'Chinese', 'ru': 'Russian', 'ar': 'Arabic', 'hi': 'Hindi',
-            'bn': 'Bengali', 'pa': 'Punjabi', 'te': 'Telugu', 'mr': 'Marathi',
-            'ta': 'Tamil', 'ur': 'Urdu', 'gu': 'Gujarati', 'kn': 'Kannada',
-            'ml': 'Malayalam', 'or': 'Odia', 'ne': 'Nepali', 'si': 'Sinhala',
-            'th': 'Thai', 'vi': 'Vietnamese', 'id': 'Indonesian', 'ms': 'Malay',
-            'tr': 'Turkish', 'pl': 'Polish', 'nl': 'Dutch', 'sv': 'Swedish'
+            'zh': 'Chinese', 'ru': 'Russian', 'ar': 'Arabic', 'hi': 'Hindi'
         }
     
-    # ============================================
-    # MAIN TRANSLATE METHOD
-    # ============================================
     def translate(self, text: str, source_lang: str = "auto", target_lang: str = "en") -> dict:
-        """Main translate method - FastAPI yehi call karega"""
         try:
-            print(f"Translating: {text} from {source_lang} to {target_lang}")
+            print(f"Translating: {text} to {target_lang}")
             
-            # Call the actual translation function
-            translated_text = self.translate_lyrics(text, source_lang, target_lang)
+            # Use Google Translate direct API
+            translated_text = self._translate_google(text, source_lang, target_lang)
             
-            # Agar translation fail ho jaye toh simple fallback
             if not translated_text or translated_text == text:
-                translated_text = self._simple_fallback(text, target_lang)
+                translated_text = self._translate_mymemory(text, source_lang, target_lang)
             
-            # Language detect karo agar auto hai
+            if not translated_text or translated_text == text:
+                translated_text = f"[Translation] {text}"
+            
             detected_lang = None
             if source_lang == "auto":
                 detected_lang = self._detect_language(text)
@@ -48,59 +39,40 @@ class LyricsTranslator:
                 "detected_lang": detected_lang
             }
         except Exception as e:
-            print(f"Translation error: {e}")
+            print(f"Error: {e}")
             return {
                 "original": text,
-                "translated": self._simple_fallback(text, target_lang),
+                "translated": f"[Error] {text}",
                 "source_lang": source_lang,
                 "target_lang": target_lang,
                 "detected_lang": None
             }
     
-    def _simple_fallback(self, text, target_lang):
-        """Simple fallback - isko baad mein hatana"""
-        lang_names = {
-            'hi': 'Hindi', 'en': 'English', 'es': 'Spanish', 'fr': 'French',
-            'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'ja': 'Japanese',
-            'ko': 'Korean', 'zh': 'Chinese', 'ru': 'Russian', 'ar': 'Arabic'
-        }
-        target_name = lang_names.get(target_lang, target_lang)
-        return f"[{target_name}] {text}"
-    
-    def _detect_language(self, text: str) -> str:
-        """Simple language detection"""
-        if any('\u0900' <= c <= '\u097F' for c in text):
-            return "hi"
-        if any('\u4e00' <= c <= '\u9fff' for c in text):
-            return "zh"
-        return "en"
-    
-    def translate_lyrics(self, text, source_lang='auto', target_lang='en'):
-        """Translate using multiple fallback APIs"""
-        
-        methods = [
-            self._translate_lingva,
-            self._translate_libretranslate,
-            self._translate_mymemory
-        ]
-        
-        for method in methods:
-            try:
-                result = method(text, source_lang, target_lang)
-                if result and result != text:
-                    print(f"✅ Translation successful using {method.__name__}")
-                    return result
-            except Exception as e:
-                print(f"Method {method.__name__} failed: {e}")
-                continue
-        
-        return None
+    def _translate_google(self, text, source_lang, target_lang):
+        try:
+            source = source_lang if source_lang != 'auto' else 'auto'
+            url = "https://translate.googleapis.com/translate_a/single"
+            params = {
+                "client": "gtx",
+                "sl": source,
+                "tl": target_lang,
+                "dt": "t",
+                "q": text
+            }
+            response = requests.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data and len(data) > 0 and data[0] and len(data[0]) > 0:
+                    return data[0][0][0]
+            return None
+        except Exception as e:
+            print(f"Google translate error: {e}")
+            return None
     
     def _translate_mymemory(self, text, source_lang, target_lang):
-        """Use MyMemory API - Most reliable"""
         try:
-            url = "https://api.mymemory.translated.net/get"
             source = source_lang if source_lang != 'auto' else 'en'
+            url = "https://api.mymemory.translated.net/get"
             params = {
                 "q": text,
                 "langpair": f"{source}|{target_lang}"
@@ -109,7 +81,6 @@ class LyricsTranslator:
             if response.status_code == 200:
                 data = response.json()
                 translated = data.get("responseData", {}).get("translatedText", text)
-                # Remove the " [source]" suffix
                 if " [" in translated:
                     translated = translated.split(" [")[0]
                 if translated and translated != text:
@@ -119,38 +90,10 @@ class LyricsTranslator:
             print(f"MyMemory error: {e}")
             return None
     
-    def _translate_libretranslate(self, text, source_lang, target_lang):
-        """Use LibreTranslate"""
-        try:
-            url = "https://libretranslate.com/translate"
-            payload = {
-                "q": text,
-                "source": source_lang if source_lang != 'auto' else 'auto',
-                "target": target_lang,
-                "format": "text"
-            }
-            headers = {"Content-Type": "application/json"}
-            response = requests.post(url, json=payload, headers=headers, timeout=10)
-            if response.status_code == 200:
-                result = response.json()
-                return result.get('translatedText', text)
-            return None
-        except Exception as e:
-            print(f"LibreTranslate error: {e}")
-            return None
-    
-    def _translate_lingva(self, text, source_lang, target_lang):
-        """Use Lingva Translate"""
-        try:
-            url = f"https://lingva.ml/api/v1/{source_lang}/{target_lang}/{urllib.parse.quote(text)}"
-            response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                return data.get('translation', text)
-            return None
-        except Exception as e:
-            print(f"Lingva error: {e}")
-            return None
+    def _detect_language(self, text: str) -> str:
+        if any('\u0900' <= c <= '\u097F' for c in text):
+            return "hi"
+        return "en"
     
     def save_translation(self, original, translated, source_lang, target_lang):
         try:
@@ -176,7 +119,7 @@ class LyricsTranslator:
             
             return True
         except Exception as e:
-            print(f"Error saving translation: {e}")
+            print(f"Error saving: {e}")
             return False
     
     def get_saved_translations(self):
@@ -189,23 +132,22 @@ class LyricsTranslator:
             return []
     
     def get_pronunciation_guide(self, text, lang='es'):
-        """Generate pronunciation guide"""
         text_lower = text.lower()
         
         guides = {
             'hi': {
                 'guide': text_lower,
                 'tips': [
-                    "🇮🇳 Hindi uses Devanagari script",
-                    "🔊 'क' sounds like 'ka', 'ख' like 'kha'",
-                    "💡 Practice with common words: नमस्ते (Namaste)"
+                    "Hindi uses Devanagari script",
+                    "Practice with common words: Namaste"
                 ]
             },
             'es': {
-                'guide': text_lower.replace('ll', 'y').replace('ñ', 'ny'),
+                'guide': text_lower.replace('ll', 'y').replace('n', 'ny'),
                 'tips': [
-                    "🇪🇸 'LL' sounds like 'Y' in 'yes'",
-                    "🇪🇸 'Ñ' sounds like 'NY' in 'canyon'"
+                    "LL sounds like Y in yes",
+                    "N with tilde sounds like NY",
+                    "Roll your R's"
                 ]
             }
         }
@@ -213,9 +155,9 @@ class LyricsTranslator:
         guide_info = guides.get(lang, {
             'guide': text_lower,
             'tips': [
-                "🔊 Break words into syllables",
-                "🔊 Practice slowly at first",
-                "🔊 Listen to native speakers"
+                "Break words into syllables",
+                "Practice slowly at first",
+                "Listen to native speakers"
             ]
         })
         
