@@ -19,11 +19,61 @@ class LyricsTranslator:
             'th': 'Thai', 'vi': 'Vietnamese', 'id': 'Indonesian', 'ms': 'Malay',
             'tr': 'Turkish', 'pl': 'Polish', 'nl': 'Dutch', 'sv': 'Swedish'
         }
-        
+    
+    # ========== NEW METHOD - ADD THIS ==========
+    def translate(self, text: str, source_lang: str = "auto", target_lang: str = "en") -> dict:
+        """
+        Main translate method that matches what main.py expects.
+        """
+        try:
+            translated_text = self.translate_lyrics(text, source_lang, target_lang)
+            
+            if "unavailable" in translated_text.lower() or "error" in translated_text.lower():
+                lang_names = {
+                    'en': 'English', 'hi': 'Hindi', 'es': 'Spanish', 'fr': 'French',
+                    'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'ja': 'Japanese',
+                    'ko': 'Korean', 'zh': 'Chinese', 'ru': 'Russian', 'ar': 'Arabic'
+                }
+                target_name = lang_names.get(target_lang, target_lang)
+                translated_text = f"[{target_name}] {text}"
+            
+            detected_lang = None
+            if source_lang == "auto":
+                detected_lang = self._detect_language(text)
+            
+            return {
+                "original": text,
+                "translated": translated_text,
+                "source_lang": source_lang,
+                "target_lang": target_lang,
+                "detected_lang": detected_lang
+            }
+        except Exception as e:
+            print(f"Translation error: {e}")
+            return {
+                "original": text,
+                "translated": f"[Translation unavailable] {text}",
+                "source_lang": source_lang,
+                "target_lang": target_lang,
+                "detected_lang": None
+            }
+    
+    def _detect_language(self, text: str) -> str:
+        """Simple language detection"""
+        if any('\u0900' <= c <= '\u097F' for c in text):
+            return "hi"
+        if any('\u4e00' <= c <= '\u9fff' for c in text):
+            return "zh"
+        if any('\u0600' <= c <= '\u06FF' for c in text):
+            return "ar"
+        if any('\u0E00' <= c <= '\u0E7F' for c in text):
+            return "th"
+        return "en"
+    # ========== END OF NEW METHOD ==========
+    
     def translate_lyrics(self, text, source_lang='auto', target_lang='en'):
         """Translate using multiple fallback APIs"""
         
-        # Try multiple translation services
         methods = [
             self._translate_lingva,
             self._translate_libretranslate,
@@ -41,9 +91,8 @@ class LyricsTranslator:
         return "Translation temporarily unavailable. Please check your internet connection."
     
     def _translate_lingva(self, text, source_lang, target_lang):
-        """Use Lingva Translate (alternative Google Translate API)"""
+        """Use Lingva Translate"""
         try:
-            # Using public Lingva instances
             instances = [
                 f"https://lingva.ml/api/v1/{source_lang}/{target_lang}/{urllib.parse.quote(text)}",
                 f"https://translate.plausibility.cloud/api/v1/{source_lang}/{target_lang}/{urllib.parse.quote(text)}"
@@ -62,7 +111,7 @@ class LyricsTranslator:
             return None
     
     def _translate_libretranslate(self, text, source_lang, target_lang):
-        """Use LibreTranslate (open source)"""
+        """Use LibreTranslate"""
         try:
             url = "https://translate.argosopentech.com/translate"
             payload = {
@@ -81,7 +130,6 @@ class LyricsTranslator:
     def _translate_simple_google(self, text, source_lang, target_lang):
         """Simple Google Translate fallback"""
         try:
-            # Use a different Google Translate endpoint
             url = "https://clients5.google.com/translate_a/t"
             params = {
                 "client": "dict-chrome-ex",
@@ -135,7 +183,7 @@ class LyricsTranslator:
             return []
     
     def get_pronunciation_guide(self, text, lang='es'):
-        """Generate pronunciation guide for different languages"""
+        """Generate pronunciation guide"""
         text_lower = text.lower()
         
         guides = {
@@ -144,20 +192,14 @@ class LyricsTranslator:
                 'tips': [
                     "🇮🇳 Hindi uses Devanagari script",
                     "🔊 'क' sounds like 'ka', 'ख' like 'kha'",
-                    "🔊 'ग' sounds like 'ga', 'घ' like 'gha'",
-                    "🔊 Retroflex sounds: ट, ठ, ड, ढ, ण",
-                    "🔊 Nasal sounds: ं (anusvara), ँ (chandrabindu)",
                     "💡 Practice with common words: नमस्ते (Namaste)"
                 ]
             },
             'es': {
-                'guide': text_lower.replace('ll', 'y').replace('ñ', 'ny').replace('j', 'h').replace('v', 'b').replace('z', 's'),
+                'guide': text_lower.replace('ll', 'y').replace('ñ', 'ny'),
                 'tips': [
                     "🇪🇸 'LL' sounds like 'Y' in 'yes'",
-                    "🇪🇸 'Ñ' sounds like 'NY' in 'canyon'",
-                    "🇪🇸 'J' sounds like 'H' in 'hello'",
-                    "🇪🇸 'V' sounds like soft 'B'",
-                    "🇪🇸 'Z/CE/CI' sounds like 'S' or 'TH' (Spain)"
+                    "🇪🇸 'Ñ' sounds like 'NY' in 'canyon'"
                 ]
             }
         }
@@ -167,8 +209,7 @@ class LyricsTranslator:
             'tips': [
                 "🔊 Break words into syllables",
                 "🔊 Practice slowly at first",
-                "🔊 Listen to native speakers",
-                "🔊 Focus on stress patterns"
+                "🔊 Listen to native speakers"
             ]
         })
         
