@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>LinguaFlow - Professional Translation Suite with Spotify</title>
+    <title>LinguaFlow - Professional Translation Suite</title>
     <style>
         * {
             margin: 0;
@@ -11,7 +11,6 @@
             box-sizing: border-box;
         }
 
-        /* Premium Background with Image */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             min-height: 100vh;
@@ -23,7 +22,6 @@
             padding: 20px;
         }
 
-        /* Glassmorphism Container */
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -35,7 +33,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Dark Mode with Premium Feel */
         body.dark-mode {
             background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.7)), 
                         url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=2070&auto=format&fit=crop');
@@ -47,7 +44,6 @@
             color: #f0f0f0;
         }
 
-        /* Header Section */
         .header {
             background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(139, 92, 246, 0.95));
             padding: 32px 40px;
@@ -75,18 +71,6 @@
             opacity: 0.9;
         }
 
-        /* Spotify Badge */
-        .spotify-badge {
-            background: #1DB954;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 12px;
-            vertical-align: middle;
-        }
-
-        /* Theme Toggle Button */
         .theme-toggle {
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -105,7 +89,6 @@
             transform: translateY(-2px);
         }
 
-        /* Navigation Tabs */
         .nav-tabs {
             display: flex;
             gap: 4px;
@@ -156,7 +139,6 @@
             background: linear-gradient(135deg, #4f46e5, #8b5cf6);
         }
 
-        /* Content Panels */
         .content-panel {
             display: none;
             padding: 40px;
@@ -178,7 +160,6 @@
             }
         }
 
-        /* Input Area */
         .input-group {
             margin-bottom: 24px;
         }
@@ -220,7 +201,6 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        /* Language Selectors */
         .language-row {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -283,7 +263,6 @@
             transform: rotate(180deg);
         }
 
-        /* Button Styles */
         .button-group {
             display: flex;
             gap: 12px;
@@ -335,57 +314,6 @@
             color: white;
         }
 
-        .btn-spotify {
-            background: linear-gradient(135deg, #1DB954, #191414);
-            color: white;
-        }
-
-        /* Spotify Player Card */
-        .spotify-player-card {
-            background: linear-gradient(135deg, #1DB954, #191414);
-            padding: 24px;
-            border-radius: 20px;
-            margin-bottom: 24px;
-            color: white;
-        }
-
-        .spotify-song-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .album-art {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-        }
-
-        .song-details {
-            flex: 1;
-        }
-
-        .now-playing-label {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .song-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 5px 0;
-        }
-
-        .artist-name {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        /* Result Card */
         .result-card {
             margin-top: 32px;
             padding: 24px;
@@ -428,7 +356,6 @@
             color: #f3f4f6;
         }
 
-        /* Voice Controls */
         .voice-controls {
             display: flex;
             gap: 12px;
@@ -469,7 +396,6 @@
             cursor: pointer;
         }
 
-        /* Share Buttons */
         .share-buttons {
             display: flex;
             gap: 12px;
@@ -486,7 +412,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Saved Items */
         .saved-item {
             background: #f9fafb;
             padding: 20px;
@@ -504,7 +429,6 @@
             transform: translateX(4px);
         }
 
-        /* Pronunciation Guide */
         .pronunciation-card {
             background: #f9fafb;
             padding: 24px;
@@ -516,7 +440,6 @@
             background: #1f2937;
         }
 
-        /* Status Messages */
         .status-message {
             padding: 12px 20px;
             border-radius: 12px;
@@ -554,7 +477,6 @@
             border: 1px solid #c7d2fe;
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
             body {
                 padding: 12px;
@@ -606,11 +528,6 @@
                 width: 100%;
                 text-align: center;
             }
-
-            .spotify-song-info {
-                flex-direction: column;
-                text-align: center;
-            }
         }
 
         @media (max-width: 480px) {
@@ -627,7 +544,6 @@
             }
         }
 
-        /* Scrollbar Styling */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -647,7 +563,6 @@
             background: #4338ca;
         }
 
-        /* Loading Spinner */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -669,8 +584,8 @@
         <div class="header">
             <div class="header-content">
                 <div class="title-section">
-                    <h1>LinguaFlow <span class="spotify-badge">Spotify Ready</span></h1>
-                    <p>Professional Translation Suite with Real-time Spotify Integration</p>
+                    <h1>LinguaFlow</h1>
+                    <p>Professional Translation Suite</p>
                 </div>
                 <button class="theme-toggle" onclick="toggleTheme()">Switch to Dark Mode</button>
             </div>
@@ -678,7 +593,6 @@
 
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('translate')">Translate</button>
-            <button class="nav-tab" onclick="switchTab('spotify')">Spotify</button>
             <button class="nav-tab" onclick="switchTab('saved')">Library</button>
             <button class="nav-tab" onclick="switchTab('pronunciation')">Pronunciation</button>
         </div>
@@ -770,56 +684,6 @@
             </div>
         </div>
 
-        <!-- Spotify Panel -->
-        <div id="spotify-panel" class="content-panel">
-            <div id="spotifyStatus" class="status-message" style="display:none;"></div>
-            
-            <div id="spotifyLoginSection" style="text-align: center; padding: 40px;">
-                <h3 style="margin-bottom: 20px;">Connect to Spotify</h3>
-                <p style="margin-bottom: 30px; color: #6b7280;">Connect your Spotify account to get real-time lyrics of currently playing songs</p>
-                <button class="btn-primary btn-spotify" onclick="connectSpotify()" style="font-size: 1.1rem; padding: 15px 40px;">
-                    Connect Spotify Account
-                </button>
-            </div>
-            
-            <div id="spotifyPlayerSection" style="display:none;">
-                <div class="spotify-player-card">
-                    <div class="spotify-song-info">
-                        <img id="albumArt" class="album-art" src="" alt="Album Art" style="display: none;">
-                        <div class="song-details">
-                            <div class="now-playing-label">Currently Playing</div>
-                            <div class="song-name" id="songName">-</div>
-                            <div class="artist-name" id="artistName">-</div>
-                        </div>
-                        <button class="btn-secondary" onclick="refreshSpotify()" style="background: rgba(255,255,255,0.2); color: white;">Refresh</button>
-                    </div>
-                </div>
-                
-                <div class="button-group">
-                    <button class="btn-primary" onclick="fetchSpotifyLyrics()">Fetch Lyrics</button>
-                    <button class="btn-primary btn-voice" onclick="translateSpotifyLyrics()">Translate Lyrics</button>
-                </div>
-                
-                <div id="spotifyLyricsResult" style="display:none;">
-                    <div class="result-card">
-                        <div class="result-section">
-                            <div class="result-label">Original Lyrics</div>
-                            <div class="result-text" id="spotifyOriginalLyrics"></div>
-                        </div>
-                        <div class="result-section">
-                            <div class="result-label">Translation</div>
-                            <div class="result-text" id="spotifyTranslatedLyrics"></div>
-                        </div>
-                        
-                        <div class="voice-controls">
-                            <button class="btn-primary btn-voice" onclick="speakSpotifyTranslation()">Listen to Translation</button>
-                            <button class="btn-secondary" onclick="saveSpotifyTranslation()">Save to Library</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Saved Panel -->
         <div id="saved-panel" class="content-panel">
             <div class="button-group">
@@ -852,12 +716,22 @@
     <script>
         let currentTranslation = {};
         let currentUtterance = null;
-        
-        // Spotify variables
-        let spotifyConnected = false;
-        let currentSpotifySong = null;
-        let currentSpotifyLyrics = null;
-        let currentSpotifyTranslation = null;
+
+        // Voice mapping for different languages
+        const voiceMap = {
+            'en': 'en-US',      // English (US)
+            'hi': 'hi-IN',      // Hindi (India)
+            'es': 'es-ES',      // Spanish (Spain)
+            'fr': 'fr-FR',      // French (France)
+            'de': 'de-DE',      // German (Germany)
+            'it': 'it-IT',      // Italian (Italy)
+            'pt': 'pt-PT',      // Portuguese (Portugal)
+            'ja': 'ja-JP',      // Japanese (Japan)
+            'ko': 'ko-KR',      // Korean (Korea)
+            'zh': 'zh-CN',      // Chinese (China)
+            'ru': 'ru-RU',      // Russian (Russia)
+            'ar': 'ar-EG'       // Arabic (Egypt)
+        };
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -886,16 +760,6 @@
 
         function showStatus(message, type) {
             const statusDiv = document.getElementById('statusMessage');
-            statusDiv.textContent = message;
-            statusDiv.className = `status-message status-${type}`;
-            statusDiv.style.display = 'block';
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 3000);
-        }
-
-        function showSpotifyStatus(message, type) {
-            const statusDiv = document.getElementById('spotifyStatus');
             statusDiv.textContent = message;
             statusDiv.className = `status-message status-${type}`;
             statusDiv.style.display = 'block';
@@ -950,6 +814,33 @@
             return div.innerHTML;
         }
 
+        // Helper function to get the best voice for a language
+        function setBestVoiceForUtterance(utterance, targetLang) {
+            const voices = window.speechSynthesis.getVoices();
+            const targetVoiceCode = voiceMap[targetLang] || 'en-US';
+            
+            // First try to find an exact match
+            let selectedVoice = voices.find(voice => voice.lang === targetVoiceCode);
+            
+            // If no exact match, try to find any voice with the same language prefix
+            if (!selectedVoice) {
+                const langPrefix = targetVoiceCode.split('-')[0];
+                selectedVoice = voices.find(voice => voice.lang.startsWith(langPrefix));
+            }
+            
+            // If still no match, try to find a voice that includes the language code
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.includes(targetLang));
+            }
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+                console.log(`Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+            }
+            
+            return utterance;
+        }
+
         function speakTranslation() {
             const text = document.getElementById('translatedText').innerText;
             const targetLang = document.getElementById('targetLang').value;
@@ -968,26 +859,26 @@
             setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(text);
                 
-                const voiceMap = {
-                    'en': 'en-US', 'hi': 'hi-IN', 'es': 'es-ES', 'fr': 'fr-FR',
-                    'de': 'de-DE', 'it': 'it-IT', 'pt': 'pt-PT', 'ja': 'ja-JP',
-                    'ko': 'ko-KR', 'zh': 'zh-CN', 'ru': 'ru-RU', 'ar': 'ar-EG'
-                };
-                
+                // Set the language code
                 utterance.lang = voiceMap[targetLang] || 'en-US';
                 utterance.rate = parseFloat(speed);
                 utterance.pitch = parseFloat(pitch);
                 
+                // Set the best available voice for this language
+                setBestVoiceForUtterance(utterance, targetLang);
+                
                 utterance.onstart = function() {
-                    showStatus('Speaking...', 'success');
+                    const langName = document.getElementById('targetLang').options[document.getElementById('targetLang').selectedIndex]?.text || targetLang;
+                    showStatus(`Speaking in ${langName}...`, 'success');
                 };
                 
                 utterance.onend = function() {
                     showStatus('Finished speaking', 'success');
                 };
                 
-                utterance.onerror = function() {
-                    showStatus('Speech failed', 'error');
+                utterance.onerror = function(event) {
+                    console.error('Speech error:', event);
+                    showStatus('Speech failed. Browser may not support this language.', 'error');
                 };
                 
                 window.speechSynthesis.speak(utterance);
@@ -1087,15 +978,12 @@
             setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(text);
                 
-                const voiceMap = {
-                    'en': 'en-US', 'hi': 'hi-IN', 'es': 'es-ES', 'fr': 'fr-FR',
-                    'de': 'de-DE', 'it': 'it-IT', 'pt': 'pt-PT', 'ja': 'ja-JP',
-                    'ko': 'ko-KR', 'zh': 'zh-CN', 'ru': 'ru-RU', 'ar': 'ar-EG'
-                };
-                
                 utterance.lang = voiceMap[lang] || 'en-US';
                 utterance.rate = 1;
                 utterance.pitch = 1;
+                
+                // Set the best available voice
+                setBestVoiceForUtterance(utterance, lang);
                 
                 utterance.onstart = function() {
                     showStatus('Playing saved translation...', 'success');
@@ -1195,10 +1083,12 @@
 
             setTimeout(() => {
                 const utterance = new SpeechSynthesisUtterance(text);
-                const voiceMap = {'en': 'en-US', 'hi': 'hi-IN', 'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE'};
+                
                 utterance.lang = voiceMap[lang] || 'en-US';
                 utterance.rate = 1;
                 utterance.pitch = 1;
+                
+                setBestVoiceForUtterance(utterance, lang);
                 
                 utterance.onstart = function() {
                     showStatus('Speaking...', 'success');
@@ -1220,192 +1110,17 @@
             showStatus('Cleared', 'success');
         }
 
-        // ============ SPOTIFY FUNCTIONS ============
-        
-        function connectSpotify() {
-            fetch('/spotify/login')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.auth_url) {
-                        window.location.href = data.auth_url;
-                    }
-                })
-                .catch(error => {
-                    showSpotifyStatus('Failed to connect to Spotify', 'error');
-                });
-        }
-
-        function refreshSpotify() {
-            showSpotifyStatus('Fetching current song...', 'loading');
-            fetch('/spotify/current')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.song) {
-                        currentSpotifySong = data.song;
-                        document.getElementById('songName').textContent = data.song.name;
-                        document.getElementById('artistName').textContent = data.song.artist;
-                        if (data.song.album_art) {
-                            const albumArt = document.getElementById('albumArt');
-                            albumArt.src = data.song.album_art;
-                            albumArt.style.display = 'block';
-                        }
-                        if (data.lyrics) {
-                            currentSpotifyLyrics = data.lyrics;
-                            document.getElementById('spotifyOriginalLyrics').textContent = data.lyrics;
-                            showSpotifyStatus('Lyrics found! Click Translate to continue.', 'success');
-                        } else {
-                            showSpotifyStatus('No lyrics found for this song', 'error');
-                        }
-                    } else {
-                        showSpotifyStatus('No song currently playing on Spotify', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showSpotifyStatus('Error fetching current song', 'error');
-                });
-        }
-
-        function fetchSpotifyLyrics() {
-            if (!currentSpotifySong) {
-                showSpotifyStatus('No song detected. Click Refresh first.', 'error');
-                return;
-            }
-            
-            showSpotifyStatus('Searching for lyrics...', 'loading');
-            fetch(`/spotify/lyrics?song_name=${encodeURIComponent(currentSpotifySong.name)}&artist_name=${encodeURIComponent(currentSpotifySong.artist)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.lyrics) {
-                        currentSpotifyLyrics = data.lyrics;
-                        document.getElementById('spotifyOriginalLyrics').textContent = data.lyrics;
-                        document.getElementById('spotifyLyricsResult').style.display = 'block';
-                        showSpotifyStatus('Lyrics loaded! Click Translate to continue.', 'success');
-                    } else {
-                        showSpotifyStatus('Lyrics not found for this song', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showSpotifyStatus('Error fetching lyrics', 'error');
-                });
-        }
-
-        async function translateSpotifyLyrics() {
-            if (!currentSpotifyLyrics) {
-                showSpotifyStatus('No lyrics to translate. Fetch lyrics first.', 'error');
-                return;
-            }
-            
-            const targetLang = document.getElementById('targetLang').value;
-            
-            showSpotifyStatus('Translating lyrics...', 'loading');
-            
-            try {
-                const response = await fetch('/translate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: currentSpotifyLyrics,
-                        source_lang: 'auto',
-                        target_lang: targetLang,
-                        song_id: currentSpotifySong?.track_id || 'spotify_song'
-                    })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    currentSpotifyTranslation = data;
-                    document.getElementById('spotifyTranslatedLyrics').textContent = data.translated;
-                    showSpotifyStatus('Translation complete!', 'success');
-                } else {
-                    showSpotifyStatus('Translation failed', 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showSpotifyStatus('Error translating', 'error');
-            }
-        }
-
-        function speakSpotifyTranslation() {
-            const text = document.getElementById('spotifyTranslatedLyrics').textContent;
-            const targetLang = document.getElementById('targetLang').value;
-            const speed = document.getElementById('voiceSpeed')?.value || 1;
-            const pitch = document.getElementById('voicePitch')?.value || 1;
-            
-            if (!text || text === 'Translation') {
-                showStatus('No translation to speak', 'error');
-                return;
-            }
-            
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-            }
-            
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(text);
-                const voiceMap = {
-                    'en': 'en-US', 'hi': 'hi-IN', 'es': 'es-ES', 'fr': 'fr-FR',
-                    'de': 'de-DE', 'it': 'it-IT', 'pt': 'pt-PT', 'ja': 'ja-JP',
-                    'ko': 'ko-KR', 'zh': 'zh-CN', 'ru': 'ru-RU', 'ar': 'ar-EG'
-                };
-                
-                utterance.lang = voiceMap[targetLang] || 'en-US';
-                utterance.rate = parseFloat(speed);
-                utterance.pitch = parseFloat(pitch);
-                
-                utterance.onstart = () => showStatus('Speaking...', 'success');
-                utterance.onend = () => showStatus('Finished', 'success');
-                utterance.onerror = () => showStatus('Speech failed', 'error');
-                
-                window.speechSynthesis.speak(utterance);
-            }, 100);
-        }
-
-        async function saveSpotifyTranslation() {
-            if (!currentSpotifyTranslation) {
-                showSpotifyStatus('No translation to save', 'error');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        original: currentSpotifyTranslation.original,
-                        translated: currentSpotifyTranslation.translated,
-                        source_lang: currentSpotifyTranslation.source_lang,
-                        target_lang: currentSpotifyTranslation.target_lang
-                    })
-                });
-                
-                if (response.ok) {
-                    showSpotifyStatus('Saved to library!', 'success');
-                } else {
-                    showSpotifyStatus('Save failed', 'error');
-                }
-            } catch (error) {
-                showSpotifyStatus('Error saving', 'error');
-            }
-        }
-
-        // Check for Spotify connection on load
-        function checkSpotifyConnection() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('spotify_connected') === 'true') {
-                document.getElementById('spotifyLoginSection').style.display = 'none';
-                document.getElementById('spotifyPlayerSection').style.display = 'block';
-                showSpotifyStatus('Spotify connected!', 'success');
-                refreshSpotify();
-            }
-        }
-
-        // Initialize on page load
+        // Initialize voices when the page loads
         window.addEventListener('load', function() {
-            checkSpotifyConnection();
+            // Pre-load voices
             if (window.speechSynthesis) {
                 window.speechSynthesis.getVoices();
+                // Some browsers need this to load voices properly
+                if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                    window.speechSynthesis.onvoiceschanged = function() {
+                        console.log('Voices loaded');
+                    };
+                }
             }
         });
     </script>
